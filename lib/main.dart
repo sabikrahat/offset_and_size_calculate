@@ -64,10 +64,10 @@ class _CustomTileState extends State<CustomTile> {
   @override
   void initState() {
     super.initState();
-    calculatePosition();
+    calculatePositionInInitState();
   }
 
-  void calculatePosition() {
+  void calculatePositionInInitState() {
     WidgetsBinding.instance.addPostFrameCallback((_) {
       final RenderBox renderBox =
           globalKey.currentContext!.findRenderObject() as RenderBox;
@@ -79,28 +79,41 @@ class _CustomTileState extends State<CustomTile> {
     });
   }
 
+  void calculatePosition() {
+      final RenderBox renderBox =
+          globalKey.currentContext!.findRenderObject() as RenderBox;
+      final position = renderBox.localToGlobal(Offset.zero);
+      setState(() {
+        size = renderBox.size;
+        offset = position;
+      });
+  }
+
   @override
   Widget build(BuildContext context) {
-    return Container(
-      key: globalKey,
-      height: 200,
-      width: 200,
-      alignment: Alignment.center,
-      decoration: BoxDecoration(
-        color: Colors.primaries[widget.index % Colors.primaries.length]
-            .withOpacity(0.3),
-        border: Border.all(
-          color: Colors.primaries[widget.index % Colors.primaries.length],
-          width: 2,
+    return InkWell(
+      onTap: calculatePosition,
+      child: Container(
+        key: globalKey,
+        height: 200,
+        width: 200,
+        alignment: Alignment.center,
+        decoration: BoxDecoration(
+          color: Colors.primaries[widget.index % Colors.primaries.length]
+              .withOpacity(0.3),
+          border: Border.all(
+            color: Colors.primaries[widget.index % Colors.primaries.length],
+            width: 2,
+          ),
         ),
-      ),
-      child: Column(
-        mainAxisSize: MainAxisSize.min,
-        children: [
-          Text(widget.index.toString()),
-          Text('Size: $size'),
-          Text('Offset: $offset'),
-        ],
+        child: Column(
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            Text(widget.index.toString()),
+            Text('Size: $size'),
+            Text('Offset: $offset'),
+          ],
+        ),
       ),
     );
   }
