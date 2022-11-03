@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:offset_and_size_calculate/widget_position.dart';
 
 void main() {
   runApp(const MyApp());
@@ -64,35 +65,32 @@ class _CustomTileState extends State<CustomTile> {
   @override
   void initState() {
     super.initState();
-    calculatePositionInInitState();
-  }
-
-  void calculatePositionInInitState() {
     WidgetsBinding.instance.addPostFrameCallback((_) {
-      final RenderBox renderBox =
-          globalKey.currentContext!.findRenderObject() as RenderBox;
-      final position = renderBox.localToGlobal(Offset.zero);
+      final wp = getWidgetPositionByGlobalKey(globalKey);
       setState(() {
-        size = renderBox.size;
-        offset = position;
+        size = wp.size;
+        offset = wp.offset;
       });
     });
-  }
-
-  void calculatePosition() {
-      final RenderBox renderBox =
-          globalKey.currentContext!.findRenderObject() as RenderBox;
-      final position = renderBox.localToGlobal(Offset.zero);
-      setState(() {
-        size = renderBox.size;
-        offset = position;
-      });
   }
 
   @override
   Widget build(BuildContext context) {
     return InkWell(
-      onTap: calculatePosition,
+      onTap: () {
+        final wp = getWidgetPositionByGlobalKey(globalKey);
+        setState(() {
+          size = wp.size;
+          offset = wp.offset;
+        });
+      },
+      onLongPress: () {
+        final wp = getWidgetPositionFromContext(context);
+        setState(() {
+          size = wp.size;
+          offset = wp.offset;
+        });
+      },
       child: Container(
         key: globalKey,
         height: 200,
